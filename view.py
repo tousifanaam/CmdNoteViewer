@@ -1,6 +1,5 @@
 from os import listdir, system
 from basics import Menu
-from tabulate import tabulate
 from prettytable import PrettyTable
 
 
