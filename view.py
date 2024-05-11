@@ -1,5 +1,8 @@
 from os import listdir, system
 from basics import Menu
+from tabulate import tabulate
+from prettytable import PrettyTable
+
 
 # Define ANSI color escape codes
 COLOR_RED = '\033[91m'
@@ -8,13 +11,28 @@ COLOR_YELLOW = '\033[93m'
 COLOR_BLUE = '\033[94m'
 COLOR_CYAN = '\033[96m'
 COLOR_WHITE_BG = "\033[47m"
+COLOR_LIGHT_GRAY_BG = "\033[47;30m"
 COLOR_CLEAR_SCREEN = "\033[2J"
 COLOR_RESET = '\033[0m'  # Reset to default color
 
 def fileview(filename):
+
+    def table_print(tab_data):
+        table0 = PrettyTable(*[tab_data[0]])
+        for i in tab_data[1:]:
+            load = []
+            for n in i:
+                if n.startswith("%") and n.endswith("%"):
+                    load.append(f"{COLOR_CYAN}{n[1:-1]}{COLOR_RESET}")
+                else: load.append(n)
+            table0.add_row(load)
+        print(table0)
+
     _ = system('cls')  # Clear screen (Windows)
     with open(filename, "r+") as file:
         paragraph_in: bool = False
+        table_data = []
+        in_table: bool = False
         for line in file.readlines():
             if line.startswith("<title>"):
                 title = "TITLE: " + line[7:].upper().strip()
@@ -38,6 +56,14 @@ def fileview(filename):
                     print(line[3:])
                 else:
                     print(line)
+            elif line.startswith("<!ta>"):
+                table_print(table_data)
+                in_table = False
+                table_data = []
+            elif line.startswith("<ta>"):
+                in_table = True
+            elif in_table:
+                table_data.append([i.strip() for i in line.split(",")])
             elif line.startswith("<e>"):
                 print("\n")
             else:
