@@ -47,7 +47,6 @@ def fileview(filename):
         print(table0)
 
     def check_inline(line: str):
-        # add colors
         line = line.replace("<c_bl>", f"{COLOR_BLACK}")
         line = line.replace("<c_r>", f"{COLOR_RED}")
         line = line.replace("<c_g>", f"{COLOR_GREEN}")
@@ -74,9 +73,8 @@ def fileview(filename):
         line = line.replace("<cb_w>", f"{COLOR_WHITE_BG}")
         line = line.replace("<c_cs>", f"{COLOR_CLEAR_SCREEN}")
         line = line.replace("<c_rs>", f"{COLOR_RESET}")
-        if '<hi>' in line:
-            line = line.replace('<hi>', f"{COLOR_LIGHT_YELLOW_BG}{COLOR_BLACK}")
-            line = line.replace('<!hi>', f"{COLOR_RESET}")
+        line = line.replace('<hi>', f"{COLOR_LIGHT_YELLOW_BG}{COLOR_BLACK}")
+        line = line.replace('<!hi>', f"{COLOR_RESET}")
         return line
 
     clear() # clear screen
