@@ -1,6 +1,95 @@
-from os import listdir, system
-from basics import *
-from prettytable import PrettyTable
+from os import name, system, listdir
+from subprocess import CalledProcessError
+try:
+    from fuzzywuzzy import process
+except ModuleNotFoundError:
+    print("[!] Missing Module. Attempting to install it...")
+    try:
+        _ = system("pip install fuzzywuzzy")
+        from fuzzywuzzy import process
+    except CalledProcessError as e:
+        print(f"[x] Failed to install 'fuzzywuzzy': {e}")
+        print("[!] Please install 'fuzzywuzzy' manually and try running the program again.")
+        exit()
+try:
+    from prettytable import PrettyTable
+except ModuleNotFoundError:
+    print("[!] Missing Module. Attempting to install it...")
+    try:
+        _ = system("pip install prettytable")
+        from prettytable import PrettyTable
+    except CalledProcessError as e:
+        print(f"[x] Failed to install 'prettytable': {e}")
+        print("[!] Please install 'prettytable' manually and try running the program again.")
+        exit()
+import inspect
+
+
+AUTHOR = "Tousif Anaam"
+
+
+class Menu():
+
+    class ArgumentNotFuncError(Exception):
+        pass
+
+    def __init__(self, *args, validate_zero: bool = True, show_doc: bool = False) -> None:
+        for i in args:
+            if not inspect.isfunction(i):
+                raise self.ArgumentNotFuncError(
+                    "Only functions are checked as valid arguments.")
+        self.funcs = args
+        self.zero = validate_zero
+        self.show_doc = show_doc
+
+    def __str__(self):
+        def f(x): return f"{(len(str(len(self.funcs))) - len(str(x))) * '0'}"
+        res = "Options:\n"
+        for x, i in enumerate(self.funcs):
+            res += "[{0}{1}] {2}\n".format(f(x + 1), str(x + 1), i.__name__)
+        return res
+
+
+    def run(self, custom_str: str = None):
+        clear()
+        while True:
+            if custom_str is not None and isinstance(custom_str, str):
+                print(custom_str)
+            else:
+                print(self.__str__())
+            foo = input("Choose an option: ").strip()
+            print()
+
+            # Try to convert input to integer
+            try:
+                option_index = int(foo)
+                if 0 < option_index <= len(self.funcs):
+                    self.funcs[option_index - 1]()
+                    break
+                elif self.zero and option_index == 0:
+                    for func in self.funcs:
+                        func()
+                    break
+            except ValueError:
+                # Fuzzy search if input is not an integer
+                matched_func, score = process.extractOne(
+                    foo, [func.__name__ for func in self.funcs])
+                if score >= 70:  # Adjust threshold as needed
+                    for func in self.funcs:
+                        if func.__name__ == matched_func:
+                            func()
+                            break
+                    break
+
+            clear()
+            print("[!] INVALID OPTION SELECTED. ( No match found for '{0}' )\n".format(foo))
+
+
+def clear() -> None:
+    if name == "nt":
+        _ = system('cls')
+    else:
+        _ = system('clear')
 
 
 # ANSI Colors
@@ -131,7 +220,7 @@ def fileview(filename):
 
 load = []
 for filename in listdir():
-    if not filename.endswith(".py") and not filename.endswith(".bat"):
+    if not filename.endswith(".py") and not filename.endswith(".bat") and not (filename.startswith("__") and filename.endswith("__")):
         exec(f"def {filename}():\n\tfileview('{filename}')")
         load.append(filename)
 
