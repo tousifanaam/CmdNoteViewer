@@ -25,72 +25,6 @@ except ModuleNotFoundError:
 import inspect
 
 
-AUTHOR = "Tousif Anaam"
-
-
-class Menu():
-
-    class ArgumentNotFuncError(Exception):
-        pass
-
-    def __init__(self, *args, validate_zero: bool = True) -> None:
-        for i in args:
-            if not inspect.isfunction(i):
-                raise self.ArgumentNotFuncError(
-                    "Only functions are checked as valid arguments.")
-        self.funcs = args
-        self.zero = validate_zero
-
-    def __str__(self):
-        def f(x): return f"{(len(str(len(self.funcs))) - len(str(x))) * '0'}"
-        res = "Options:\n"
-        for x, i in enumerate(self.funcs):
-            res += "[{0}{1}] {2}\n".format(f(x + 1), str(x + 1), i.__name__)
-        return res
-
-
-    def run(self, custom_str: str = None):
-        clear()
-        while True:
-            if custom_str is not None and isinstance(custom_str, str):
-                print(custom_str)
-            else:
-                print(self.__str__())
-            foo = input("Choose an option: ").strip()
-            print()
-
-            # Try to convert input to integer
-            try:
-                option_index = int(foo)
-                if 0 < option_index <= len(self.funcs):
-                    self.funcs[option_index - 1]()
-                    break
-                elif self.zero and option_index == 0:
-                    for func in self.funcs:
-                        func()
-                    break
-            except ValueError:
-                # Fuzzy search if input is not an integer
-                matched_func, score = process.extractOne(
-                    foo, [func.__name__ for func in self.funcs])
-                if score >= 70:  # Adjust threshold as needed
-                    for func in self.funcs:
-                        if func.__name__ == matched_func:
-                            func()
-                            break
-                    break
-
-            clear()
-            print("[!] INVALID OPTION SELECTED. ( No match found for '{0}' )\n".format(foo))
-
-
-def clear() -> None:
-    if name == "nt":
-        _ = system('cls')
-    else:
-        _ = system('clear')
-
-
 # ANSI Colors
 COLOR_BLACK = "\033[30m"
 COLOR_RED = '\033[31m'
@@ -100,7 +34,6 @@ COLOR_BLUE = '\033[34m'
 COLOR_MAGENTA = '\033[35m'
 COLOR_CYAN = '\033[36m'
 COLOR_WHITE = '\033[37m'
-
 COLOR_BLACK_BG = "\033[40m"
 COLOR_RED_BG = '\033[41m'
 COLOR_GREEN_BG = '\033[42m'
@@ -117,7 +50,6 @@ COLOR_LIGHT_BLUE_BG = "\033[104m"
 COLOR_LIGHT_MAGENTA_BG = "\033[105m"
 COLOR_LIGHT_CYAN_BG = "\033[106m"
 COLOR_WHITE_BG = "\033[107m"
-
 COLOR_CLEAR_SCREEN = "\033[2J"
 COLOR_RESET = '\033[0m'
 
@@ -216,12 +148,72 @@ def fileview(filename):
     print(f"\n{f'{COLOR_WHITE_BG}{COLOR_RED}Alhamdulillah{COLOR_RESET}'.center(100)}\n")
 
 
+class Menu():
 
-load = []
-for filename in listdir():
-    if not filename.endswith(".py") and not filename.endswith(".bat") and not (filename.startswith("__") and filename.endswith("__")):
-        exec(f"def {filename}():\n\tfileview('{filename}')")
-        load.append(filename)
+    class ArgumentNotFuncError(Exception):
+        pass
 
-mymenu = Menu(*[eval(filename) for filename in load])
-mymenu.run()
+    def __init__(self, *args, validate_zero: bool = True) -> None:
+        for i in args:
+            if not inspect.isfunction(i):
+                raise self.ArgumentNotFuncError(
+                    "Only functions are checked as valid arguments.")
+        self.funcs = args
+        self.zero = validate_zero
+
+    def __str__(self):
+        def f(x): return f"{(len(str(len(self.funcs))) - len(str(x))) * '0'}"
+        res = "Options:\n"
+        for x, i in enumerate(self.funcs):
+            res += "[{0}{1}] {2}\n".format(f(x + 1), str(x + 1), i.__name__)
+        return res
+
+
+    def run(self, custom_str: str = None):
+        clear()
+        while True:
+            if custom_str is not None and isinstance(custom_str, str):
+                print(custom_str)
+            else:
+                print(self.__str__())
+            foo = input("Choose an option: ").strip()
+            print()
+            try:
+                option_index = int(foo)
+                if 0 < option_index <= len(self.funcs):
+                    self.funcs[option_index - 1]()
+                    break
+                elif self.zero and option_index == 0:
+                    for func in self.funcs:
+                        func()
+                    break
+            except ValueError:
+                matched_func, score = process.extractOne(
+                    foo, [func.__name__ for func in self.funcs])
+                if score >= 70:
+                    for func in self.funcs:
+                        if func.__name__ == matched_func:
+                            func()
+                            break
+                    break
+
+            clear()
+            print("[!] INVALID OPTION SELECTED. ( No match found for '{0}' )\n".format(foo))
+
+
+def clear() -> None:
+    if name == "nt":
+        _ = system('cls')
+    else:
+        _ = system('clear')
+
+
+if __name__ == "__main__":
+    load = []
+    for filename in listdir():
+        if not filename.endswith(".py") and not filename.endswith(".bat") and not (filename.startswith("__") and filename.endswith("__")):
+            exec(f"def {filename}():\n\tfileview('{filename}')")
+            load.append(filename)
+
+    mymenu = Menu(*[eval(filename) for filename in load])
+    mymenu.run()
