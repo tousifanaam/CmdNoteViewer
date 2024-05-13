@@ -33,14 +33,13 @@ class Menu():
     class ArgumentNotFuncError(Exception):
         pass
 
-    def __init__(self, *args, validate_zero: bool = True, show_doc: bool = False) -> None:
+    def __init__(self, *args, validate_zero: bool = True) -> None:
         for i in args:
             if not inspect.isfunction(i):
                 raise self.ArgumentNotFuncError(
                     "Only functions are checked as valid arguments.")
         self.funcs = args
         self.zero = validate_zero
-        self.show_doc = show_doc
 
     def __str__(self):
         def f(x): return f"{(len(str(len(self.funcs))) - len(str(x))) * '0'}"
