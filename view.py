@@ -8,7 +8,7 @@ except ModuleNotFoundError:
         _ = system("pip install fuzzywuzzy")
         from fuzzywuzzy import process
     except CalledProcessError as e:
-        print(f"[x] Failed to install 'fuzzywuzzy': {e}")
+        print(f"Err. Failed to install 'fuzzywuzzy': {e}")
         print("[!] Please install 'fuzzywuzzy' manually and try running the program again.")
         exit()
 try:
@@ -19,7 +19,7 @@ except ModuleNotFoundError:
         _ = system("pip install prettytable")
         from prettytable import PrettyTable
     except CalledProcessError as e:
-        print(f"[x] Failed to install 'prettytable': {e}")
+        print(f"Err. Failed to install 'prettytable': {e}")
         print("[!] Please install 'prettytable' manually and try running the program again.")
         exit()
 import inspect
@@ -121,9 +121,11 @@ def fileview(filename):
                 print(f"{COLOR_LIGHT_GRAY_BG}{COLOR_BLUE} {COLOR_RED}{line[3:-1].strip()}{COLOR_RESET}")
             elif line.startswith("<w>"): # warning
                 print(f"{COLOR_GREEN}{COLOR_YELLOW}  ⚠  {COLOR_GREEN} {COLOR_RED}{line[3:].strip()}{COLOR_RESET}")
+            elif line.startswith("<d>"): # definition
+                print(f"{COLOR_LIGHT_BLUE_BG}{COLOR_WHITE}{line[3:].strip()}{COLOR_RESET}")
             elif line.startswith("<sn>"): # self note
                 "note not from lecture but for self as a reminder of something to be mindful."
-                print(f"{COLOR_GREEN}{COLOR_YELLOW}  💡  {COLOR_GREEN} {COLOR_RED}{line[4:].strip()}{COLOR_RESET}")
+                print(f"{COLOR_GREEN}{COLOR_YELLOW}  💡  {COLOR_GREEN} {COLOR_WHITE}{line[4:].strip()}{COLOR_RESET}")
             elif line.startswith("<!ta>"): # table end
                 table_print(table_data)
                 in_table = False
